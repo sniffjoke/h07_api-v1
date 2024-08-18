@@ -7,7 +7,7 @@ import {
 } from "../controllers/authController";
 import {errorMiddleware} from "../middlewares/errorMiddleware";
 import {authMiddlewareWithBearer} from "../middlewares/authMiddleware";
-import {loginUserValidator} from "../middlewares/usersValidators";
+import {emailUserValidator, loginUserValidator, passwordUserValidator} from "../middlewares/usersValidators";
 
 
 const router = express.Router();
@@ -15,6 +15,8 @@ const router = express.Router();
 router.route('/login')
     .post(
         loginUserValidator,
+        passwordUserValidator,
+        emailResending,
         errorMiddleware,
         loginController
     );
@@ -24,6 +26,8 @@ router.route('/login')
 router.route('/registration')
     .post(
         loginUserValidator,
+        passwordUserValidator,
+        emailUserValidator,
         errorMiddleware,
         registerController
     );
