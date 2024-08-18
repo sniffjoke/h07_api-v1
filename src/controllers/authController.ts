@@ -121,7 +121,11 @@ export const activateEmailUserController = async (req: Request, res: Response) =
     try {
         const confirmationCode: any = req.query.code
         const activate = await userService.activate(confirmationCode)
-        res.status(200).json(activate)
+        if (activate) {
+            res.status(200).json(activate)
+        } else {
+            res.status(400).send('Юзер не найден')
+        }
     } catch (e) {
         res.status(500).send(e)
     }
@@ -135,7 +139,8 @@ export const emailResending = async (req: Request, res: Response) => {
             res.status(400).send('Юзер не найден')
             return
         }
-        if (validateUser?.emailConfirmation?.isConfirmed === true) {
+        if (validateUser.emailConfirmation?.isConfirmed === true) {
+            console.log(123)
             res.status(400).send('Юзер уже активирован')
             return
         }
