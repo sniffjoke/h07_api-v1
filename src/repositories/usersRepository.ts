@@ -14,9 +14,10 @@ export const usersRepository = {
         }
     },
 
-    async createUser(newUser: UserDBType): Promise<any> {
+    async createUser(newUser: UserDBType, activationLink?: string): Promise<any> {
         const user = {
             ...newUser,
+            activationLink,
             createdAt: new Date(Date.now()).toISOString()
         }
         await userCollection.insertOne(user)

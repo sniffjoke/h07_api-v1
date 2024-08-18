@@ -3,7 +3,52 @@ import {usersQueryRepository} from "../queryRepositories/usersQueryRepository";
 import {tokenService} from "../services/token.service";
 import {ObjectId} from "mongodb";
 import {userService} from "../services/user.service";
+import * as bcrypt from 'bcrypt';
+import {usersRepository} from "../repositories/usersRepository";
+import {v4 as uuid} from 'uuid'
+import MailService from "../services/mail.service";
 
+
+export const registerController = async (req: Request, res: Response) => {
+    try {
+        const {login, email, password} = req.body
+        const candidateEmail = await usersQueryRepository.getUserByEmail(email)
+        if (candidateEmail) {
+            res.status(401).json({
+                errorsMessages: [
+                    {
+                        message: "Данный пользователь уже существует",
+                        field: "email"
+                    }
+                ]
+            })
+            return
+        }
+        const candidateLogin = await usersQueryRepository.getUserByLogin(login)
+        if (candidateLogin) {
+            res.status(401).json({
+                errorsMessages: [
+                    {
+                        message: "Данный пользователь уже существует",
+                        field: "login"
+                    }
+                ]
+            })
+            return
+        }
+        const hashPassword = await bcrypt.hash(password, 3)
+        const activationLink = uuid()
+        console.log(activationLink)
+
+        const user = await usersRepository.createUser({email, password: hashPassword, login}, activationLink)
+        const mailService = new MailService()
+        await mailService.sendActivationMail(email, `${process.env.API_URL}/?code=${activationLink}`)
+        const token = tokenService.createToken(user)
+        res.status(204).send({accessToken: token})
+    } catch (e) {
+        res.status(500).send(e)
+    }
+}
 
 export const loginController = async (req: Request, res: Response) => {
     try {
