@@ -3,6 +3,11 @@ import {ObjectId} from "mongodb";
 import {usersQueryRepository} from "../queryRepositories/usersQueryRepository";
 import {UserDBType} from "../dtos/users.dto";
 
+export interface EmailConfirmationModel {
+        confirmationCode?: string
+        expirationDate?: Date
+        isConfirmed: boolean
+}
 
 export const usersRepository = {
 
@@ -14,10 +19,10 @@ export const usersRepository = {
         }
     },
 
-    async createUser(newUser: UserDBType, activationLink?: string): Promise<any> {
+    async createUser(newUser: UserDBType, emailConfirmation: EmailConfirmationModel): Promise<any> {
         const user = {
             ...newUser,
-            activationLink,
+            emailConfirmation,
             createdAt: new Date(Date.now()).toISOString()
         }
         await userCollection.insertOne(user)

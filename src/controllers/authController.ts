@@ -4,9 +4,10 @@ import {tokenService} from "../services/token.service";
 import {ObjectId} from "mongodb";
 import {userService} from "../services/user.service";
 import * as bcrypt from 'bcrypt';
-import {usersRepository} from "../repositories/usersRepository";
+import {EmailConfirmationModel, usersRepository} from "../repositories/usersRepository";
 import {v4 as uuid} from 'uuid'
 import MailService from "../services/mail.service";
+import {add} from 'date-fns'
 
 
 export const registerController = async (req: Request, res: Response) => {
@@ -26,7 +27,7 @@ export const registerController = async (req: Request, res: Response) => {
         }
         const candidateLogin = await usersQueryRepository.getUserByLogin(login)
         if (candidateLogin) {
-            res.status(401).json({
+            res.status(400).json({
                 errorsMessages: [
                     {
                         message: "Данный пользователь уже существует",
@@ -38,11 +39,19 @@ export const registerController = async (req: Request, res: Response) => {
         }
         const hashPassword = await bcrypt.hash(password, 3)
         const activationLink = uuid()
-        console.log(activationLink)
+        const emailConfirmation: EmailConfirmationModel = {
+                isConfirmed: false,
+                confirmationCode: activationLink,
+                expirationDate: add(new Date(), {
+                        hours: 1,
+                        minutes: 30,
+                    }
+                )
+        }
 
-        const user = await usersRepository.createUser({email, password: hashPassword, login}, activationLink)
+        const user = await usersRepository.createUser({email, password: hashPassword, login}, emailConfirmation)
         const mailService = new MailService()
-        await mailService.sendActivationMail(email, `${process.env.API_URL}/?code=${activationLink}`)
+        await mailService.sendActivationMail(email, `${process.env.API_URL}/api/auth/registration-confirmation/?code=${activationLink}`)
         const token = tokenService.createToken(user)
         res.status(204).send({accessToken: token})
     } catch (e) {
@@ -102,6 +111,16 @@ export const getMeController = async (req: Request, res: Response) => {
             login: user?.login,
         })
 
+    } catch (e) {
+        res.status(500).send(e)
+    }
+}
+
+export const activateUserController = async (req: Request, res: Response) => {
+    try {
+        const activateLink: any = req.query.code
+        const activate = await userService.activate(activateLink)
+        res.status(200).json(activate)
     } catch (e) {
         res.status(500).send(e)
     }

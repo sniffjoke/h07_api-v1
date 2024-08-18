@@ -1,8 +1,9 @@
 import {Request, Response} from 'express';
 import {ObjectId} from "mongodb";
-import {usersRepository} from "../repositories/usersRepository";
+import {EmailConfirmationModel, usersRepository} from "../repositories/usersRepository";
 import {usersQueryHelper} from "../helpers/usersHelper";
 import {usersQueryRepository} from "../queryRepositories/usersQueryRepository";
+import {UserDBType} from "../dtos/users.dto";
 
 
 export const getUsersController = async (req: Request<any, any, any, any>, res: Response) => {
@@ -32,6 +33,7 @@ export const getUserByIdController = async (req: Request, res: Response) => {
 
 export const createUserController = async (req: Request, res: Response) => {
     try {
+        const {login, email, password} = req.body
         const uniqueEmail = await usersQueryRepository.validateUserByEmail(req.body.email)
         const uniqueLogin = await usersQueryRepository.validateUserByLogin(req.body.login)
         if (uniqueEmail) {
@@ -56,7 +58,9 @@ export const createUserController = async (req: Request, res: Response) => {
             })
             return
         }
-        const newUser = await usersRepository.createUser(req.body)
+        const emailConfirmation: EmailConfirmationModel = req.body.emailConfirmation
+        const userData: UserDBType = {login, email, password}
+        const newUser = await usersRepository.createUser(userData, emailConfirmation)
         const newUserOutput = usersQueryRepository.userMapOutput(newUser)
         res.status(201).json(newUserOutput)
 
@@ -74,4 +78,3 @@ export const deleteUserByIdController = async (req: Request, res: Response) => {
         res.status(500).send(e)
     }
 }
-

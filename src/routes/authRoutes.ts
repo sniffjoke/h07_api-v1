@@ -1,5 +1,10 @@
 import express from "express";
-import {getMeController, loginController, registerController} from "../controllers/authController";
+import {
+    activateUserController,
+    getMeController,
+    loginController,
+    registerController
+} from "../controllers/authController";
 import {errorMiddleware} from "../middlewares/errorMiddleware";
 import {authMiddlewareWithBearer} from "../middlewares/authMiddleware";
 
@@ -11,13 +16,16 @@ router.route('/login')
         loginController
     );
 
-// router.route('/registration-confirmation')
-//     .post(
-//         loginController
-//     );
+
+
 router.route('/registration')
     .post(
         registerController
+    );
+
+router.route('/registration-confirmation')
+    .post(
+        activateUserController
     );
 // router.route('/registration-email-resending')
 //     .post(

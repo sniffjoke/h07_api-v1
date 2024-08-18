@@ -25,10 +25,11 @@ class MailService {
             text: '',
             html:
                 `
-            <div>
-            <h1>Для активации перейдите по ссылке</h1>
-            <a href="${link}">${link}</a>
-</div>
+                <h1>Thank for your registration</h1>
+                <p>To finish registration please follow the link below:
+                    <a href='${link}'>Завершить регистрацию</a>
+                </p>
+
             `
         })
     }

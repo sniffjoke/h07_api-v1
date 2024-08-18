@@ -1,4 +1,5 @@
 import {usersQueryRepository} from "../queryRepositories/usersQueryRepository";
+import {userCollection} from "../db/mongo-db";
 
 
 export const userService = {
@@ -9,6 +10,14 @@ export const userService = {
         } else {
             return  await usersQueryRepository.validateUserByEmail(userLoginOrEmail)
         }
+    },
+
+    async activate(validationLink: any) {
+        const user = await userCollection.findOne({emailConfirmation: {validationLink}})
+        if (!user) {
+            throw new Error('User not found')
+        }
+        await userCollection.updateOne({user}, {$set: {emailConfirmation: {isConfirmed: true}}})
     }
 
 }
