@@ -116,7 +116,7 @@ export const getMeController = async (req: Request, res: Response) => {
     }
 }
 
-export const activateUserController = async (req: Request, res: Response) => {
+export const activateEmailUserController = async (req: Request, res: Response) => {
     try {
         const activateLink: any = req.query.code
         const activate = await userService.activate(activateLink)
