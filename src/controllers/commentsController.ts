@@ -5,7 +5,7 @@ import {commentsQueryHelper} from "../helpers/commentsHelper";
 import {commentsQueryRepository} from "../queryRepositories/commentsQueryRepository";
 import {postsQueryRepository} from "../queryRepositories/postsQueryRepository";
 import {usersQueryRepository} from "../queryRepositories/usersQueryRepository";
-import {authService} from "../services/auth.service";
+import {tokenService} from "../services/token.service";
 
 
 export const getCommentsController = async (req: Request<any, any, any, any>, res: Response) => {
@@ -57,12 +57,12 @@ export const getCommentByIdController = async (req: Request, res: Response) => {
 export const createCommentByPostIdWithParams = async (req: Request, res: Response) => {
     try {
         const post = await postsQueryRepository.findPostById(new ObjectId(req.params.id))
-        const token = authService.getToken(req.headers.authorization)
+        const token = tokenService.getToken(req.headers.authorization)
         if (token === undefined) {
             res.status(401).send('Нет авторизации')
             return
         }
-        const decodedToken: any = authService.decodeToken(token)
+        const decodedToken: any = tokenService.decodeToken(token)
         if (decodedToken === null) {
             res.status(401).send('Нет авторизации')
             return

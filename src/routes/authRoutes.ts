@@ -11,6 +11,20 @@ router.route('/login')
         loginController
     );
 
+router.route('/registration-confirmation')
+    .post(
+        loginController
+    );
+router.route('/registration')
+    .post(
+        loginController
+    );
+router.route('/registration-email-resending')
+    .post(
+        loginController
+    );
+
+
 router.route('/me')
     .get(
         authMiddlewareWithBearer,

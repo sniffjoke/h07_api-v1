@@ -1,18 +1,14 @@
 import {Request, Response} from 'express';
 import {usersQueryRepository} from "../queryRepositories/usersQueryRepository";
-import {authService} from "../services/auth.service";
+import {tokenService} from "../services/token.service";
 import {ObjectId} from "mongodb";
+import {userService} from "../services/user.service";
 
 
 export const loginController = async (req: Request, res: Response) => {
     try {
         const {loginOrEmail, password} = req.body;
-        let user
-        if (!/^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/.test(loginOrEmail)) {
-            user = await usersQueryRepository.validateUserByLogin(loginOrEmail)
-        } else {
-            user = await usersQueryRepository.validateUserByEmail(loginOrEmail)
-        }
+        const user = await userService.validateUser(loginOrEmail)
         if (!user) {
             res.status(401).json({
                 errorsMessages: [
@@ -26,7 +22,7 @@ export const loginController = async (req: Request, res: Response) => {
         }
         const isPasswordCorrect = password !== user.password // service
         if (!isPasswordCorrect) {
-            const token = authService.createToken(user)
+            const token = tokenService.createToken(user)
             res.status(200).json({accessToken: token})
             return
         }
@@ -40,7 +36,6 @@ export const loginController = async (req: Request, res: Response) => {
         })
         return
 
-
     } catch (e) {
         res.status(500).send(e)
     }
@@ -48,13 +43,13 @@ export const loginController = async (req: Request, res: Response) => {
 
 export const getMeController = async (req: Request, res: Response) => {
     try {
-        const token = authService.getToken(req.headers.authorization)
+        const token = tokenService.getToken(req.headers.authorization)
         if (token === undefined) {
             res.status(401).send('Нет авторизации')
             return
         }
 
-        const decodedToken: any = authService.decodeToken(token)
+        const decodedToken: any = tokenService.decodeToken(token)
         const user = await usersQueryRepository.getUserById(new ObjectId(decodedToken._id))
         res.status(200).json({
             id: decodedToken._id,

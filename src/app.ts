@@ -1,16 +1,13 @@
 import express from "express";
 import cors from "cors";
 import {SETTINGS} from "./settings";
-import {commentCollection, connectToDB} from "./db/mongo-db";
+import {connectToDB} from "./db/mongo-db";
 import blogsRoutes from "./routes/blogsRoutes";
 import postsRoutes from "./routes/postsRoutes";
 import testingRoutes from "./routes/testingRoutes";
 import usersRoutes from "./routes/usersRoutes";
 import authRoutes from "./routes/authRoutes";
 import commentsRoutes from "./routes/commentsRoutes";
-// import blogsRoutes from "./routers/blogsRoutes";
-// import postsRoutes from "./routers/postsRoutes";
-// import testingRoutes from "./routers/testingRoutes";
 
 connectToDB()
 

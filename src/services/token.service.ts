@@ -3,7 +3,7 @@ import * as jwt from 'jsonwebtoken';
 import {SETTINGS} from "../settings";
 
 
-export const authService = {
+export const tokenService = {
 
     createToken(user: User) {
          const token = jwt.sign(
