@@ -75,7 +75,8 @@ export const loginController = async (req: Request, res: Response) => {
             })
             return
         }
-        const isPasswordCorrect = password !== user.password // service
+        const isPasswordCorrect = bcrypt.compare(password, user.password)
+            // password !== user.password // service
         if (!isPasswordCorrect) {
             const token = tokenService.createToken(user)
             res.status(200).json({accessToken: token})
@@ -147,7 +148,7 @@ export const emailResending = async (req: Request, res: Response) => {
             res.status(400).json({
                     errorsMessages: [
                         {
-                            message: "'Юзер не найден'",
+                            message: "Юзер не найден",
                             field: "code"
                         }
                     ]
@@ -157,7 +158,15 @@ export const emailResending = async (req: Request, res: Response) => {
         }
         if (validateUser.emailConfirmation?.isConfirmed === true) {
             console.log(123)
-            res.status(400).send('Юзер уже активирован')
+            res.status(400).json({
+                    errorsMessages: [
+                        {
+                            message: "Юзер уже активирован",
+                            field: "code"
+                        }
+                    ]
+                }
+            )
             return
         }
         const activationLink = uuid()
