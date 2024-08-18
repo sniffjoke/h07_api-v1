@@ -7,12 +7,15 @@ import {
 } from "../controllers/authController";
 import {errorMiddleware} from "../middlewares/errorMiddleware";
 import {authMiddlewareWithBearer} from "../middlewares/authMiddleware";
+import {loginUserValidator} from "../middlewares/usersValidators";
 
 
 const router = express.Router();
 
 router.route('/login')
     .post(
+        loginUserValidator,
+        errorMiddleware,
         loginController
     );
 
@@ -20,6 +23,8 @@ router.route('/login')
 
 router.route('/registration')
     .post(
+        loginUserValidator,
+        errorMiddleware,
         registerController
     );
 

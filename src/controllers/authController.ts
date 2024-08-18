@@ -144,7 +144,15 @@ export const emailResending = async (req: Request, res: Response) => {
         const {email} = req.body
         const validateUser = await userCollection.findOne({email})
         if (!validateUser) {
-            res.status(400).send('Юзер не найден')
+            res.status(400).json({
+                    errorsMessages: [
+                        {
+                            message: "'Юзер не найден'",
+                            field: "code"
+                        }
+                    ]
+                }
+            )
             return
         }
         if (validateUser.emailConfirmation?.isConfirmed === true) {
