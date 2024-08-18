@@ -124,7 +124,15 @@ export const activateEmailUserController = async (req: Request, res: Response) =
         if (activate) {
             res.status(200).json(activate)
         } else {
-            res.status(400).send('Юзер не найден')
+            res.status(400).json({
+                    errorsMessages: [
+                        {
+                            message: "'Юзер не найден'",
+                            field: "code"
+                        }
+                    ]
+                }
+            )
         }
     } catch (e) {
         res.status(500).send(e)
