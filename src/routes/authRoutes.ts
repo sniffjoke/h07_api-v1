@@ -1,6 +1,6 @@
 import express from "express";
 import {
-    activateEmailUserController,
+    activateEmailUserController, emailResending,
     getMeController,
     loginController,
     registerController
@@ -27,10 +27,11 @@ router.route('/registration-confirmation')
     .post(
         activateEmailUserController
     );
-// router.route('/registration-email-resending')
-//     .post(
-//         loginController
-//     );
+
+router.route('/registration-email-resending')
+    .post(
+        emailResending
+    );
 
 
 router.route('/me')

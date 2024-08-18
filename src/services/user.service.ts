@@ -12,12 +12,13 @@ export const userService = {
         }
     },
 
-    async activate(validationLink: any) {
-        const user = await userCollection.findOne({emailConfirmation: {validationLink}})
+    async activate(confirmationCode: any) {
+        const user = await userCollection.findOne({'emailConfirmation.confirmationCode': `${confirmationCode}`})
+        console.log(user)
         if (!user) {
             throw new Error('User not found')
         }
-        await userCollection.updateOne({user}, {$set: {emailConfirmation: {isConfirmed: true}}})
+        await userCollection.updateOne(user, {$set: {'emailConfirmation.isConfirmed': true}})
     }
 
 }

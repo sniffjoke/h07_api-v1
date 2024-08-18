@@ -8,6 +8,7 @@ import {EmailConfirmationModel, usersRepository} from "../repositories/usersRepo
 import {v4 as uuid} from 'uuid'
 import MailService from "../services/mail.service";
 import {add} from 'date-fns'
+import {userCollection} from "../db/mongo-db";
 
 
 export const registerController = async (req: Request, res: Response) => {
@@ -40,13 +41,13 @@ export const registerController = async (req: Request, res: Response) => {
         const hashPassword = await bcrypt.hash(password, 3)
         const activationLink = uuid()
         const emailConfirmation: EmailConfirmationModel = {
-                isConfirmed: false,
-                confirmationCode: activationLink,
-                expirationDate: add(new Date(), {
-                        hours: 1,
-                        minutes: 30,
-                    }
-                )
+            isConfirmed: false,
+            confirmationCode: activationLink,
+            expirationDate: add(new Date(), {
+                    hours: 1,
+                    minutes: 30,
+                }
+            )
         }
 
         const user = await usersRepository.createUser({email, password: hashPassword, login}, emailConfirmation)
@@ -118,10 +119,42 @@ export const getMeController = async (req: Request, res: Response) => {
 
 export const activateEmailUserController = async (req: Request, res: Response) => {
     try {
-        const activateLink: any = req.query.code
-        const activate = await userService.activate(activateLink)
+        const confirmationCode: any = req.query.code
+        const activate = await userService.activate(confirmationCode)
         res.status(200).json(activate)
     } catch (e) {
         res.status(500).send(e)
     }
 }
+
+export const emailResending = async (req: Request, res: Response) => {
+    try {
+        const {email} = req.body
+        const validateUser = await userCollection.findOne({email})
+        if (!validateUser) {
+            res.status(400).send('Юзер не найден')
+            return
+        }
+        if (validateUser?.emailConfirmation?.isConfirmed === true) {
+            res.status(400).send('Юзер уже активирован')
+            return
+        }
+        const activationLink = uuid()
+        const emailConfirmation: EmailConfirmationModel = {
+            isConfirmed: false,
+            confirmationCode: activationLink,
+            expirationDate: add(new Date(), {
+                    hours: 1,
+                    minutes: 30,
+                }
+            )
+        }
+        const mailService = new MailService()
+        await mailService.sendActivationMail(email, `${process.env.API_URL}/api/auth/registration-confirmation/?code=${activationLink}`)
+        await userCollection.updateOne({email}, {$set: {emailConfirmation}})
+        res.status(204).json()
+    } catch (e) {
+        res.status(500).send(e)
+    }
+}
+
