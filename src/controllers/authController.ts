@@ -15,7 +15,7 @@ export const registerController = async (req: Request, res: Response) => {
         const {login, email, password} = req.body
         const candidateEmail = await usersQueryRepository.getUserByEmail(email)
         if (candidateEmail) {
-            res.status(401).json({
+            res.status(400).json({
                 errorsMessages: [
                     {
                         message: "Данный пользователь уже существует",
