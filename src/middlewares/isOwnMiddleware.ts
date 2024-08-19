@@ -28,7 +28,6 @@ export const isOwnMiddleware = async (req: Request, res: Response, next: NextFun
             next()
         } else {
             res.status(403).send('Нет доступа')
-            return
         }
     } catch (e) {
         res.status(401).send('Нет авторизации catch')
