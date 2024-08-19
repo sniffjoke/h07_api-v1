@@ -138,7 +138,7 @@ export const activateEmailUserController = async (req: Request, res: Response) =
         }
         const activate = await userService.activate(confirmationCode)
         if (activate) {
-            res.status(200).json(activate)
+            res.status(204).json(activate)
         } else {
             res.status(400).json({
                     errorsMessages: [
@@ -172,13 +172,12 @@ export const emailResending = async (req: Request, res: Response) => {
             return
             // throw ApiError.BadRequest('Юзер не найден', 'email')
         }
-        if (validateUser.emailConfirmation?.isConfirmed === true) {
-            console.log(123)
+        if (validateUser.emailConfirmation?.isConfirmed) {
             res.status(400).json({
                     errorsMessages: [
                         {
                             message: "Юзер уже активирован",
-                            field: "code"
+                            field: "email"
                         }
                     ]
                 }
