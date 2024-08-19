@@ -7,8 +7,9 @@
   "scripts": {
     "watch": "tsc -w",
     "dev": "yarn nodemon --inspect dist/index.js",
+    "jest": "jest i --runInBand --detectOpenHandles --forceExit",
     "start": "node dist/index.js",
-    "jest": "jest i --runInBand --detectOpenHandles --forceExit"
+    "postinstall": "tsc"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
