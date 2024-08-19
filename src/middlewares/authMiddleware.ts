@@ -37,6 +37,7 @@ export const authMiddlewareWithBearer = (req: Request, res: Response, next: Next
             res.status(401).send('Нет авторизации')
             return;
         }
+
         next()
     } catch (e) {
         res.status(401).send('Нет авторизации')
