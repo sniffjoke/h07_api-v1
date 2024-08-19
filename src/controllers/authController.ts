@@ -1,4 +1,4 @@
-import {Request, Response} from 'express';
+import {NextFunction, Request, Response} from 'express';
 import {usersQueryRepository} from "../queryRepositories/usersQueryRepository";
 import {tokenService} from "../services/token.service";
 import {ObjectId} from "mongodb";
@@ -60,7 +60,7 @@ export const registerController = async (req: Request, res: Response) => {
     }
 }
 
-export const loginController = async (req: Request, res: Response) => {
+export const loginController = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const {loginOrEmail, password} = req.body;
         const user = await userService.validateUser(loginOrEmail)
@@ -75,12 +75,12 @@ export const loginController = async (req: Request, res: Response) => {
             })
             return
         }
-        const isPasswordCorrect = bcrypt.compare(password, user.password)
+        const isPasswordCorrect = await bcrypt.compare(password, user.password)
             // password !== user.password // service
-        if (!isPasswordCorrect) {
+        if (isPasswordCorrect) {
             const token = tokenService.createToken(user)
             res.status(200).json({accessToken: token})
-            return
+            // return
         }
         res.status(401).json({
             errorsMessages: [
@@ -93,7 +93,9 @@ export const loginController = async (req: Request, res: Response) => {
         return
 
     } catch (e) {
-        res.status(500).send(e)
+        console.log('catch')
+        // res.status(500).send(e)
+        return next(e)
     }
 }
 
@@ -149,12 +151,13 @@ export const emailResending = async (req: Request, res: Response) => {
                     errorsMessages: [
                         {
                             message: "Юзер не найден",
-                            field: "code"
+                            field: "email"
                         }
                     ]
                 }
             )
             return
+            // throw ApiError.BadRequest('Юзер не найден', 'email')
         }
         if (validateUser.emailConfirmation?.isConfirmed === true) {
             console.log(123)

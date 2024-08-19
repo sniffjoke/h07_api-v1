@@ -7,16 +7,20 @@ import {
 } from "../controllers/authController";
 import {errorMiddleware} from "../middlewares/errorMiddleware";
 import {authMiddlewareWithBearer} from "../middlewares/authMiddleware";
-import {emailUserValidator, loginUserValidator, passwordUserValidator} from "../middlewares/usersValidators";
+import {
+    emailAuthRegisterValidator,
+    loginAuthRegisterValidator,
+    passwordAuthRegisterValidator
+} from "../middlewares/authValidators";
 
 
 const router = express.Router();
 
 router.route('/login')
     .post(
-        loginUserValidator,
-        passwordUserValidator,
-        emailResending,
+        // loginUserValidator,
+        // passwordUserValidator,
+        // emailResending,
         errorMiddleware,
         loginController
     );
@@ -25,9 +29,9 @@ router.route('/login')
 
 router.route('/registration')
     .post(
-        loginUserValidator,
-        passwordUserValidator,
-        emailUserValidator,
+        loginAuthRegisterValidator,
+        emailAuthRegisterValidator,
+        passwordAuthRegisterValidator,
         errorMiddleware,
         registerController
     );
@@ -39,6 +43,7 @@ router.route('/registration-confirmation')
 
 router.route('/registration-email-resending')
     .post(
+        emailAuthRegisterValidator,
         emailResending
     );
 

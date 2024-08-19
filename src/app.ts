@@ -8,6 +8,7 @@ import testingRoutes from "./routes/testingRoutes";
 import usersRoutes from "./routes/usersRoutes";
 import authRoutes from "./routes/authRoutes";
 import commentsRoutes from "./routes/commentsRoutes";
+import {errorApiMiddleware} from "./middlewares/errorApiMiddleware";
 
 connectToDB()
 
@@ -29,3 +30,4 @@ app.use(SETTINGS.PATH.COMMENTS, commentsRoutes)
 app.use(SETTINGS.PATH.USERS, usersRoutes)
 app.use(SETTINGS.PATH.AUTH, authRoutes)
 app.use(SETTINGS.PATH.TESTING, testingRoutes)
+app.use(errorApiMiddleware)
