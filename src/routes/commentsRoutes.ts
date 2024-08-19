@@ -15,9 +15,7 @@ const router = express.Router();
 
 router.route('/')
     .get(getCommentsController)
-    // .post(
-    //
-    // )
+
 
 router.route('/:id')
     .put(
@@ -29,10 +27,10 @@ router.route('/:id')
         updateCommentController
     )
     .delete(
+        isOwnMiddleware,
         authMiddlewareWithBearer,
         idCommentValidator,
         errorMiddleware,
-        isOwnMiddleware,
         deleteCommentController
     )
     .get(
