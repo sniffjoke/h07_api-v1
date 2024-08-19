@@ -4,6 +4,7 @@ import {EmailConfirmationModel, usersRepository} from "../repositories/usersRepo
 import {usersQueryHelper} from "../helpers/usersHelper";
 import {usersQueryRepository} from "../queryRepositories/usersQueryRepository";
 import {UserDBType} from "../dtos/users.dto";
+import * as bcrypt from "bcrypt";
 
 
 export const getUsersController = async (req: Request<any, any, any, any>, res: Response) => {
@@ -58,8 +59,12 @@ export const createUserController = async (req: Request, res: Response) => {
             })
             return
         }
-        const emailConfirmation: EmailConfirmationModel = req.body.emailConfirmation
-        const userData: UserDBType = {login, email, password}
+        // const emailConfirmation: EmailConfirmationModel = req.body.emailConfirmation
+        const emailConfirmation: EmailConfirmationModel = {
+            isConfirmed: true
+        }
+        const hashPassword = await bcrypt.hash(password, 3)
+        const userData: UserDBType = {login, email, password: hashPassword}
         const newUser = await usersRepository.createUser(userData, emailConfirmation)
         const newUserOutput = usersQueryRepository.userMapOutput(newUser)
         res.status(201).json(newUserOutput)
