@@ -76,22 +76,22 @@ export const loginController = async (req: Request, res: Response, next: NextFun
             return
         }
         const isPasswordCorrect = await bcrypt.compare(password, user.password)
-            // password !== user.password // service
+        // password !== user.password // service
         if (isPasswordCorrect) {
             const token = tokenService.createToken(user)
             res.status(200).json({accessToken: token})
             // return
+        } else {
+            res.status(401).json({
+                errorsMessages: [
+                    {
+                        message: "Неправильный пароль",
+                        field: "password"
+                    }
+                ]
+            })
+            return
         }
-        res.status(401).json({
-            errorsMessages: [
-                {
-                    message: "Неправильный пароль",
-                    field: "password"
-                }
-            ]
-        })
-        return
-
     } catch (e) {
         console.log('catch')
         // res.status(500).send(e)
