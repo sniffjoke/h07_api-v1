@@ -122,7 +122,20 @@ export const getMeController = async (req: Request, res: Response) => {
 
 export const activateEmailUserController = async (req: Request, res: Response) => {
     try {
-        const confirmationCode: any = req.query.code
+        const confirmationCode: any = req.body.code
+        const findedUser = await userCollection.findOne({'emailConfirmation.confirmationCode': confirmationCode})
+        if (findedUser?.emailConfirmation?.isConfirmed) {
+            res.status(400).json({
+                    errorsMessages: [
+                        {
+                            message: "'Юзер уже активирован'",
+                            field: "code"
+                        }
+                    ]
+                }
+            )
+            return
+        }
         const activate = await userService.activate(confirmationCode)
         if (activate) {
             res.status(200).json(activate)
